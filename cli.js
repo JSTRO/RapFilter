@@ -19,8 +19,7 @@ function songCallback (err, songs, lyricsAndExplanations) {
 function lyricsSearchCb(err, lyricsAndExplanations){
   if(err) {
     console.log("Error: " + err);
-  }
-  else {
+  } else {
     var lyrics = lyricsAndExplanations.lyrics;
     lyrics.getFullLyrics(true);
   }
@@ -30,26 +29,41 @@ function lyricsSearchCb(err, lyricsAndExplanations){
   var strFinal = strNoPunc.split(whiteSpacePattern);
   console.log(strFinal);
 
-  var baseUrl = 'http://www.wdyl.com/profanity?q=';
   var firstWord = strFinal[13];
 
-  request({
-    url: baseUrl + firstWord
-  }, function callback (err, response, body) {
-    body = JSON.parse(body);
+  isWordNaughty(firstWord, function naughtyCallback (err, response) {
     if (err) {
       console.log('oops there was an error');
       throw err;
     } else {
-      if (body.response === "true") {
-        console.log(firstWord + " " + "is a naughty word!");
+      if (response.isNaughty) {
+        console.log(response.word + " " + "is a naughty word!");
       }
       else {
-        console.log(firstWord + " " + "is fine by me!")
+        console.log(response.word + " " + "is fine by me!")
       }
-      console.log(body);
     }
   });
 };
+
+function isWordNaughty (word, callback) {
+  var baseUrl = 'http://www.wdyl.com/profanity?q=';
+  request({
+    url: baseUrl + word
+  }, function (err, response, body) {
+    body = JSON.parse(body);
+    if (err) {
+      callback(err, null)
+    } else {
+      var isNaughty = (body.response === "true");
+
+      console.log(body);
+      callback(null, {
+        word: word,
+        isNaughty: isNaughty
+      })
+    }
+  });
+}
 
 genius.searchSong(songQuery, "rap", songCallback);
