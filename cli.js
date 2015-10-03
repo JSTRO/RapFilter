@@ -17,12 +17,12 @@ function songCallback (err, songs, lyricsAndExplanations) {
 }
 
 function lyricsSearchCb(err, lyricsAndExplanations){
-  if(err) {
+  if (err) {
     console.log("Error: " + err);
-  } else {
-    var lyrics = lyricsAndExplanations.lyrics;
-    lyrics.getFullLyrics(true);
+    throw err;
   }
+
+  var lyrics = lyricsAndExplanations.lyrics;
   var str = lyrics.getFullLyrics(true);
   var strNoPunc = str.replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
   var whiteSpacePattern = /\s+/g;
